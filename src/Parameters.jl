@@ -2,7 +2,7 @@ module Parameters
 
 export Params, list, define, undefine
 
-include("src/struct.jl")
-include("src/methods.jl")
+include("struct.jl")
+include("methods.jl")
 
 end

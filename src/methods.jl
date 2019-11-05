@@ -1,17 +1,18 @@
-function define(params::Params, name::String,
-                type::DataType, default = 0,
-                documentation="")
+function define(params::Params, name::String, type::DataType, default = 0,
+                documentation = "")
     if occursin(r"\s", name)
-        error("Parameter name can not contain white space")
-        return params
+        error("define: Parameter name can not contain white space")
     end
 
-    if !(type <: Number || type <: String || type <: Array{T, 1} where T)
-        error("Parameter type must be Number, String or one dimensional Array")
-        return params
+    if !(type <: Union{Bool, Number, String, Array{T, 1} where T})
+        error("define: Unrecognized Parameter type:", type)
     end
 
-    if type <: Number
+    if type <: Array{T,1} where T && !(type.parameters[1] <: Union{Bool,Number})
+        error("define: Parameter Array must be of Bool or Number.")
+    end
+        
+    if type <: Union{Bool, Number}
         variable = Variable(convert(type, default), type, documentation)
     elseif type <: String
         if !(typeof(default) <: String)
@@ -36,8 +37,8 @@ function undefine(params::Params, name::String)
 end
 
 function Base.parse(params::Params, str::String)
+    # If unrecognized, just ignore it
     if match(r"^[^=]*=[^=]*([#!].*)?$", str) == nothing
-        error("Unrecognized parameter line: ", str)
         return nothing
     end
     str = replace(str, r"[#!].*$" => s"")	# remove comments 
@@ -45,12 +46,20 @@ function Base.parse(params::Params, str::String)
     (name,value) = split(str, r"\s*=\s*")		
     name = string(name)
     value = string(value)	# substring to string
+    # If name is unknown, just ignore it
     if params[name] == nothing
-        error("Unknown parameter: ", name)
         return nothing
     end
+    
     type = params.database[name].type
-    params[name] = parse(type, value)
+    if type <: Union{Bool, Number}
+        params[name] = parse(type, value)
+    elseif type <: String
+        params[name] = value
+    else # array type
+        arrayType = type.parameters[1]
+        params[name] = map(x -> parse(arrayType, x), split(value, r"\s*,\s*"))
+    end
 end
 
 function Base.read(params::Params, filename::String)

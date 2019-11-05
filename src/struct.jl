@@ -39,12 +39,15 @@ function Base.show(io::IO, ::MIME"text/plain", params::Params)
             value = variable.value
             type = variable.type
             documentation = variable.documentation
-            println(io, "  ", key, "::", type, " = ", value, ", ", documentation)
+            println(io, "  ", key, "::", type, " = ", value, " # ", documentation)
         end
     end
 end
 
 function list(params::Params)
-    collect(keys(params.database))
+    collect(params.database)
 end
 
+function Base.names(params::Params)
+    collect(keys(params.database))
+end

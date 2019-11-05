@@ -68,8 +68,74 @@ define(params, "D", String, "hello", "A string")
 
 It is also allowed to define array parameter. However, because Julie
 does support fixed size array yet so here only one-dimensional array
-is supported:
+is accepted:
 ```julia
 define(params, "E", Array{Float64,1}, [1,2], "A float array")
 ```
 
+At this time, if one type `params`, the output should be:
+```julia
+Parameter List with 5 entries:
+  A::Int64 = 0 # 
+  B::Float64 = 1.0 # 
+  C::Complex{Float64} = 2.0 + 1.0im # A complex number
+  D::String = hello # A string
+  E::Array{Float64,1} = [1.0, 2.0] # A float array
+```
+
+### Access elements in a `Params` object
+To access an element in a `Params` object is similar to `Dict`:
+```julia
+params["A"]
+```
+It is writable:
+```julia
+params["A"] = 0
+```
+
+### Read parameters from an input file
+Prepare an input file, for instance, let us write a file with name
+`input` whose content is
+```
+A = 1 # this is comment 
+
+  B = 1.5 ! this is also comment
+  C = 1+5im # a complex floating number
+D = hello, world 
+this line cannot be recognized and should be ignored
+E = 1,2,3,4,5 # an array with five elements
+```
+then to read from this file, just type
+```julia
+read(params, "input")
+```
+
+After the read and type `params`, the output should be
+```julia
+Parameter List with 5 entries:
+  A::Int64 = 1 # 
+  B::Float64 = 1.5 # 
+  C::Complex{Float64} = 1.0 + 5.0im # A complex number
+  D::String = hello, world # A string
+  E::Array{Float64,1} = [1.0, 2.0, 3.0, 4.0, 5.0] # A float array
+```
+
+### Read parameters from command line
+Julia store command line options in variable `ARGS`, to read from it
+simply type:
+```julia
+read(params, ARGS)
+```
+
+### Undefine parameters
+To undefine a parameter in `Params` object, just type:
+```julia
+undefine(params, "A")
+```
+The parameter entry with name `A` is then removed.
+
+### Miscellaneous
+#### [function] list(params::Params)
+This function returns all `Variable` in `params`.
+#### [function] Base.names(params::Params)
+This function returns all parameter names in `params`.

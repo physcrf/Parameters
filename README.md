@@ -43,35 +43,17 @@ Supported types are `Bool, Number, String, Array{T,1} where T`, note
 that only numeric array is supported (`T` must be a subtype of
 `Number`).
 
-For example, to define an `Int64` with name `A`
-without `default` and `documentation`:
+For example, to define parameters:
 ```julia
 define(params, "A", Int64)
-```
-
-To define a `Float64` with name `B` and
-`default` and without `documentation`:
-```julia
 define(params, "B", Float64, 1)
-```
-
-To define a `Complex{Float64}` with name `C`, 
-`default` and `documentation`:
-```julia
 define(params, "C", Complex{Float64}, 2+1im, "A complex number")
-```
-
-To define a `String` with name `D`:
-```julia
 define(params, "D", String, "hello", "A string")
-```
-
-It is also allowed to define array parameter. However, because Julie
-does support fixed size array yet so here only one-dimensional array
-is accepted:
-```julia
 define(params, "E", Array{Float64,1}, [1,2], "A float array")
 ```
+
+Note that since Julia does not support fixed size array yet, only
+one-dimensional numeric array is acceptable.
 
 At this time, if one type `params`, the output should be:
 ```julia
@@ -126,6 +108,9 @@ simply type:
 ```julia
 read(params, ARGS)
 ```
+
+Then you may type something like `julia test.jl A=1` or `julia test.jl
+--A=1` in the shell to give values to `params`.
 
 ### Undefine parameters
 To undefine a parameter in `Params` object, just type:

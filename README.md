@@ -91,6 +91,7 @@ then to read from this file, just type
 ```julia
 read(params, "input")
 ```
+Note that elements of an array should be separated by comma.
 
 After the read and type `params`, the output should be
 ```julia
